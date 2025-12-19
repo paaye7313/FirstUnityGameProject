@@ -12,7 +12,7 @@
 
 \- Language: C#
 
-\- Period: 2024.12 ~ 2025.01
+\- Period: 2025.12 ~ 2026.01
 
 \- Platform: PC
 
