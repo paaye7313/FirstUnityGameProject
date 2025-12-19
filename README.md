@@ -36,3 +36,15 @@
 
 
 
+\## 🛠 Development Log
+
+
+
+\### 2025-12-19
+
+\- Created player GameObject
+
+\- Implemented basic horizontal movement using Rigidbody2D
+
+\- Added wall colliders and verified player collision behavior
+
