@@ -17,7 +17,7 @@ public class PlayerController : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
-        Debug.Log($"Input: {h}, {v}");
+        //Debug.Log($"Input: {h}, {v}");
 
         moveInput = new Vector2(h, v).normalized;
     }
