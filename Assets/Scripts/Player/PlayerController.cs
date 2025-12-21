@@ -7,18 +7,25 @@ public class PlayerGridMovement : MonoBehaviour
 {
     public float moveDuration = 0.15f;
     public Tilemap wallTilemap;   // 벽 타일맵 참조
+    public Tilemap groundTilemap;
     public float moveDelay = 0.15f;
     private bool isMoving = false;
     private Vector2Int gridPosition;
     public Vector2Int CurrentGridPosition => gridPosition;
     public Goal goal;
+    public Enemy[] enemies;
+    public Vector2Int spawnGridPos;
+
 
     void Start()
     {
-        Vector3Int cellPos = wallTilemap.WorldToCell(transform.position);
+        Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);
         gridPosition = new Vector2Int(cellPos.x, cellPos.y);
+        spawnGridPos = gridPosition;
+
         transform.position = GridToWorld(gridPosition);
     }
+
 
 
     void Update()
@@ -110,15 +117,35 @@ public class PlayerGridMovement : MonoBehaviour
         gridPosition = targetGridPos;
         isMoving = false;
 
+        CheckEnemy();
         CheckGoal();
-
     }
+
     void CheckGoal()
     {
         if (gridPosition == goal.goalGridPos)
         {
             GoalUI.Instance.ShowGoal();
         }
+    }
+    void CheckEnemy()
+    {
+        foreach (Enemy enemy in enemies)
+        {
+            if (gridPosition == enemy.enemyGridPos)
+            {
+                Respawn();
+                return;
+            }
+        }
+    }
+    void Respawn()
+    {
+        StopAllCoroutines();
+        isMoving = false;
+
+        gridPosition = spawnGridPos;
+        transform.position = GridToWorld(spawnGridPos);
     }
 
 
