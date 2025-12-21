@@ -10,12 +10,16 @@ public class PlayerGridMovement : MonoBehaviour
     public float moveDelay = 0.15f;
     private bool isMoving = false;
     private Vector2Int gridPosition;
+    public Vector2Int CurrentGridPosition => gridPosition;
+    public Goal goal;
 
     void Start()
     {
-        gridPosition = Vector2Int.RoundToInt(transform.position);
+        Vector3Int cellPos = wallTilemap.WorldToCell(transform.position);
+        gridPosition = new Vector2Int(cellPos.x, cellPos.y);
         transform.position = GridToWorld(gridPosition);
     }
+
 
     void Update()
     {
@@ -105,7 +109,18 @@ public class PlayerGridMovement : MonoBehaviour
         transform.position = targetPos;
         gridPosition = targetGridPos;
         isMoving = false;
+
+        CheckGoal();
+
     }
+    void CheckGoal()
+    {
+        if (gridPosition == goal.goalGridPos)
+        {
+            GoalUI.Instance.ShowGoal();
+        }
+    }
+
 
 }
 
