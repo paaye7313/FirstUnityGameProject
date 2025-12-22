@@ -15,7 +15,7 @@ public class PlayerGridMovement : MonoBehaviour
     public Goal goal;  // 골인
     public Enemy[] enemies;  // 적
     public Vector2Int spawnGridPos;  // 스폰 포인트
-
+    public SavePoint[] savePoints;
 
     void Start()  //시작시 호출
     {
@@ -119,6 +119,7 @@ public class PlayerGridMovement : MonoBehaviour
 
         CheckEnemy();  //적 확인
         CheckGoal();  //골 확인
+        CheckSave();  //세이브포인트 확인
     }
 
     void CheckGoal()  // 골 위치 확인
@@ -147,7 +148,17 @@ public class PlayerGridMovement : MonoBehaviour
         gridPosition = spawnGridPos;  //현재 그리드좌표를 스폰좌표로 이동
         transform.position = GridToWorld(spawnGridPos);  //현재 월드좌표를 스폰좌표로 이동
     }
-
+    void CheckSave()
+    {
+        foreach (SavePoint savePoint in savePoints)
+        {
+            if (gridPosition == savePoint.saveGridPos)  //세이브포인드가 나와 겹칠경우
+            {
+                spawnGridPos = gridPosition; //세이브포인트 저장
+                return;
+            }
+        }
+    }
 
 }
 
