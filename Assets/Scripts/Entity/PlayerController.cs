@@ -10,6 +10,7 @@ public class PlayerGridMovement : MonoBehaviour
     public float moveDuration = 0.15f;  //이동 속도
     public Tilemap wallTilemap;   // 벽 타일맵 참조
     public Tilemap groundTilemap;  // 바닥 타일맵 참조
+    public Tilemap doorTilemap;  // 문 타일맵 참조
     public float moveDelay = 0.15f;  // 이동 딜레이
     private bool isMoving = false;  // 이동 조작감지
     private Vector2Int gridPosition;  //타일멥상에서의 좌표
@@ -18,13 +19,14 @@ public class PlayerGridMovement : MonoBehaviour
     public Enemy[] enemies;  // 적들
     public Vector2Int spawnGridPos;  // 스폰 포인트 좌표
     public SavePoint[] savePoints;  // 스폰 포인트들
+    public Switch[] switches; // 스위치들
 
     void Start()  //시작시 호출
     {
         Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);  //현재 월드좌표를 그리드 좌표로 보정
         gridPosition = new Vector2Int(cellPos.x, cellPos.y);
         spawnGridPos = gridPosition;  //스폰 포인트를 현재 그리드좌표로 설정
-        enemies = FindObjectsOfType<Enemy>();  // 적들 감지
+        enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);  // 적들 감지
         transform.position = GridToWorld(gridPosition);  //현재 월드좌표를 그리드좌표로 보정
     }
 
@@ -50,7 +52,10 @@ public class PlayerGridMovement : MonoBehaviour
     bool IsWall(Vector2Int gridPos)  //벽이 있는지 확인
     {
         Vector3Int cellPos = new Vector3Int(gridPos.x, gridPos.y, 0);  // 좌표를 3차원 좌표로 형변환
-        return wallTilemap.HasTile(cellPos);  // 벽 타일이 있을경우 true
+        if (wallTilemap.HasTile(cellPos)) return true;  // 벽이 있을 경우 트루
+        if (doorTilemap.HasTile(cellPos)) return true;  // 문이 있을 경우 트루
+
+        return false;
     }
     //IEnumerator Move(Vector2Int targetGridPos)  // 현재는 사용하지 않는 메소드
     //{
@@ -122,8 +127,15 @@ public class PlayerGridMovement : MonoBehaviour
         CheckEnemy();  //적 확인
         CheckGoal();  //골 확인
         CheckSave();  //세이브포인트 확인
+        CheckSwitch();  //스위치 확인
     }
-
+    void CheckSwitch()
+    {
+        foreach (var sw in switches)
+        {
+            sw.CheckSwitch(gridPosition);
+        }
+    }
     void CheckGoal()  // 골 위치 확인
     {
         if (gridPosition == goal.goalGridPos)  //골이 나와 겹칠경우
