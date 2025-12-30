@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 using System.Collections;
+using UnityEngine.SceneManagement;
+
 
 public class PlayerGridMovement : MonoBehaviour
 {
@@ -13,16 +15,16 @@ public class PlayerGridMovement : MonoBehaviour
     private Vector2Int gridPosition;  //타일멥상에서의 좌표
     public Vector2Int CurrentGridPosition => gridPosition;
     public Goal goal;  // 골인
-    public Enemy[] enemies;  // 적
-    public Vector2Int spawnGridPos;  // 스폰 포인트
-    public SavePoint[] savePoints;
+    public Enemy[] enemies;  // 적들
+    public Vector2Int spawnGridPos;  // 스폰 포인트 좌표
+    public SavePoint[] savePoints;  // 스폰 포인트들
 
     void Start()  //시작시 호출
     {
         Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);  //현재 월드좌표를 그리드 좌표로 보정
         gridPosition = new Vector2Int(cellPos.x, cellPos.y);
         spawnGridPos = gridPosition;  //스폰 포인트를 현재 그리드좌표로 설정
-
+        enemies = FindObjectsOfType<Enemy>();  // 적들 감지
         transform.position = GridToWorld(gridPosition);  //현재 월드좌표를 그리드좌표로 보정
     }
 
@@ -127,20 +129,36 @@ public class PlayerGridMovement : MonoBehaviour
         if (gridPosition == goal.goalGridPos)  //골이 나와 겹칠경우
         {
             GoalUI.Instance.ShowGoal();  // 골 글자를 표시
+            StartCoroutine(GoNextStage());  // 다음 스테이지로 이동
+        }
+    }
+    IEnumerator GoNextStage()
+    {
+        yield return new WaitForSeconds(2f);
+
+        int nextIndex = SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (nextIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            SceneManager.LoadScene(nextIndex);
+        }
+        else
+        {
+            Debug.Log("모든 스테이지 클리어!");
         }
     }
     void CheckEnemy()  //적 위치 확인
     {
         foreach (Enemy enemy in enemies)
         {
-            if (gridPosition == enemy.enemyGridPos)  //적이 나와 겹칠경우
+            if (gridPosition == enemy.gridPos)  //적이 나와 겹칠경우
             {
                 Respawn();
                 return;
             }
         }
     }
-    void Respawn()  // 리스폰
+    public void Respawn()  // 리스폰
     {
         StopAllCoroutines(); //모든 Coroutine 중단
         isMoving = false;  //이동 조작 취소

@@ -1,14 +1,24 @@
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
 public class Enemy : MonoBehaviour
 {
-    public Vector2Int enemyGridPos; // 그리드좌표
-    public Tilemap tilemap;   // 기준 타일맵
+    public Vector2Int gridPos;
 
-    void Start()
+    public void Init(Vector2Int pos)
     {
-        Vector3Int cellPos = tilemap.WorldToCell(transform.position);  //현재 월드좌표를 그리드좌표로 보정
-        enemyGridPos = new Vector2Int(cellPos.x, cellPos.y);
+        gridPos = pos;
+        transform.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0);
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            PlayerGridMovement player = other.GetComponent<PlayerGridMovement>();
+            if (player != null)
+            {
+                player.Respawn();
+            }
+        }
     }
 }
