@@ -1,24 +1,12 @@
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
 public class Enemy : MonoBehaviour
 {
-    public Vector2Int gridPos;
+    public Vector2Int enemyGridPos;
 
-    public void Init(Vector2Int pos)
+    public void SetGridPosition(Vector3Int cellPos)
     {
-        gridPos = pos;
-        transform.position = new Vector3(pos.x + 0.5f, pos.y + 0.5f, 0);
-    }
-
-    void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.CompareTag("Player"))
-        {
-            PlayerGridMovement player = other.GetComponent<PlayerGridMovement>();
-            if (player != null)
-            {
-                player.Respawn();
-            }
-        }
+        enemyGridPos = new Vector2Int(cellPos.x, cellPos.y);
     }
 }

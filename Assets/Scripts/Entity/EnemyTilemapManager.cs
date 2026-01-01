@@ -1,34 +1,65 @@
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using System.Collections.Generic;
 
 public class EnemyTilemapManager : MonoBehaviour
 {
+    public static EnemyTilemapManager Instance;
+
     [Header("Tilemap")]
     public Tilemap enemyTilemap;
 
-    [Header("Prefab")]
+    [Header("Enemy Prefab")]
     public GameObject enemyPrefab;
+
+    private List<Enemy> enemies = new List<Enemy>();
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
         SpawnEnemiesFromTilemap();
     }
 
-    void SpawnEnemiesFromTilemap()
+    public void SpawnEnemiesFromTilemap()
     {
-        // Å¸ÀÏ¸ÊÀÇ ¸ðµç ¼¿À» ¼øÈ¸
-        foreach (Vector3Int cellPos in enemyTilemap.cellBounds.allPositionsWithin)
+        ClearEnemies();
+
+        foreach (var cellPos in enemyTilemap.cellBounds.allPositionsWithin)
         {
             if (!enemyTilemap.HasTile(cellPos))
                 continue;
 
-            Vector2Int gridPos = new Vector2Int(cellPos.x, cellPos.y);
+            Vector3 worldPos = enemyTilemap.GetCellCenterWorld(cellPos);
+            GameObject enemyObj = Instantiate(enemyPrefab, worldPos, Quaternion.identity);
 
-            GameObject enemy = Instantiate(enemyPrefab, transform);
-            enemy.GetComponent<Enemy>().Init(gridPos);
+            Enemy enemy = enemyObj.GetComponent<Enemy>();
+            enemy.SetGridPosition(cellPos);
+
+            enemies.Add(enemy);
         }
+    }
 
-        // Å¸ÀÏ¸ÊÀº ¸¶Ä¿ÀÌ¹Ç·Î ¼û±è
-        enemyTilemap.gameObject.SetActive(false);
+    void ClearEnemies()
+    {
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null)
+                Destroy(enemy.gameObject);
+        }
+        enemies.Clear();
+    }
+
+    public bool IsEnemyAt(Vector2Int gridPos)
+    {
+        foreach (var enemy in enemies)
+        {
+            if (enemy.enemyGridPos == gridPos)
+                return true;
+        }
+        return false;
     }
 }

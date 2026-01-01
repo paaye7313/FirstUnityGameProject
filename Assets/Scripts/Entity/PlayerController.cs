@@ -10,7 +10,7 @@ public class PlayerGridMovement : MonoBehaviour
     public float moveDuration = 0.15f;  //이동 속도
     public Tilemap wallTilemap;   // 벽 타일맵 참조
     public Tilemap groundTilemap;  // 바닥 타일맵 참조
-    public Tilemap doorTilemap;  // 문 타일맵 참조
+    public Tilemap[] doorTilemaps;  // 문 타일맵들 참조
     public float moveDelay = 0.15f;  // 이동 딜레이
     private bool isMoving = false;  // 이동 조작감지
     private Vector2Int gridPosition;  //타일멥상에서의 좌표
@@ -53,47 +53,20 @@ public class PlayerGridMovement : MonoBehaviour
     {
         Vector3Int cellPos = new Vector3Int(gridPos.x, gridPos.y, 0);  // 좌표를 3차원 좌표로 형변환
         if (wallTilemap.HasTile(cellPos)) return true;  // 벽이 있을 경우 트루
-        if (doorTilemap.HasTile(cellPos)) return true;  // 문이 있을 경우 트루
+        foreach (var doorMap in doorTilemaps)
+        {
+            if (doorMap != null && doorMap.HasTile(cellPos))
+                return true;
+        }  // 문이 있을 경우 트루
 
         return false;
     }
-    //IEnumerator Move(Vector2Int targetGridPos)  // 현재는 사용하지 않는 메소드
-    //{
-    //    isMoving = true;
-
-    //    Vector3 startPos = transform.position;
-    //    Vector3 targetPos = GridToWorld(targetGridPos);
-
-    //    float elapsed = 0f;
-
-    //    while (elapsed < moveDuration)
-    //    {
-    //        elapsed += Time.deltaTime;
-    //        float t = elapsed / moveDuration;
-    //        transform.position = Vector3.Lerp(startPos, targetPos, t);
-    //        yield return null;
-    //    }
-
-    //    transform.position = targetPos;
-    //    gridPosition = targetGridPos;
-    //    isMoving = false;
-    //}
+    
     Vector3 GridToWorld(Vector2Int gridPos)  //그리드좌표를 월드좌표로 보정
     {
         return new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0);
     }
-    //Vector2Int GetInputDirection()  // 현재는 사용하지 않는 메소드
-    //{
-    //    Keyboard kb = Keyboard.current;
-    //    if (kb == null) return Vector2Int.zero;
-
-    //    if (kb.wKey.wasPressedThisFrame) return Vector2Int.up;
-    //    if (kb.sKey.wasPressedThisFrame) return Vector2Int.down;
-    //    if (kb.aKey.wasPressedThisFrame) return Vector2Int.left;
-    //    if (kb.dKey.wasPressedThisFrame) return Vector2Int.right;
-
-    //    return Vector2Int.zero;
-    //}
+    
     void TryMove(Vector2Int dir)  //이동 시도
     {
         Vector2Int targetGridPos = gridPosition + dir;  //현재 좌표 + 이동 방향
@@ -161,13 +134,9 @@ public class PlayerGridMovement : MonoBehaviour
     }
     void CheckEnemy()  //적 위치 확인
     {
-        foreach (Enemy enemy in enemies)
+        if (EnemyTilemapManager.Instance.IsEnemyAt(gridPosition))
         {
-            if (gridPosition == enemy.gridPos)  //적이 나와 겹칠경우
-            {
-                Respawn();
-                return;
-            }
+            Respawn();
         }
     }
     public void Respawn()  // 리스폰
