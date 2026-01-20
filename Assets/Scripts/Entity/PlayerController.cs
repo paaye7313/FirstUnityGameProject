@@ -7,100 +7,114 @@ using UnityEngine.SceneManagement;
 
 public class PlayerGridMovement : MonoBehaviour
 {
-    public float moveDuration = 0.15f;  //ÀÌµ¿ ¼Óµµ
-    public Tilemap wallTilemap;   // º® Å¸ÀÏ¸Ê ÂüÁ¶
-    public Tilemap groundTilemap;  // ¹Ù´Ú Å¸ÀÏ¸Ê ÂüÁ¶
-    public Tilemap[] doorTilemaps;  // ¹® Å¸ÀÏ¸Êµé ÂüÁ¶
-    public float moveDelay = 0.15f;  // ÀÌµ¿ µô·¹ÀÌ
-    private bool isMoving = false;  // ÀÌµ¿ Á¶ÀÛ°¨Áö
-    private Vector2Int gridPosition;  //Å¸ÀÏ¸ã»ó¿¡¼­ÀÇ ÁÂÇ¥
+    public float moveDuration = 0.15f;  //ï¿½Ìµï¿½ ï¿½Óµï¿½
+    public Tilemap wallTilemap;   // ï¿½ï¿½ Å¸ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public Tilemap groundTilemap;  // ï¿½Ù´ï¿½ Å¸ï¿½Ï¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+    public Tilemap[] doorTilemaps;  // ï¿½ï¿½ Å¸ï¿½Ï¸Êµï¿½ ï¿½ï¿½ï¿½ï¿½
+    public float moveDelay = 0.15f;  // ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½
+    private bool isMoving = false;  // ï¿½Ìµï¿½ ï¿½ï¿½ï¿½Û°ï¿½ï¿½ï¿½
+    private Vector2Int gridPosition;  //Å¸ï¿½Ï¸ï¿½ó¿¡¼ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥
     public Vector2Int CurrentGridPosition => gridPosition;
-    public Goal goal;  // °ñÀÎ
-    public Enemy[] enemies;  // Àûµé
-    public Vector2Int spawnGridPos;  // ½ºÆù Æ÷ÀÎÆ® ÁÂÇ¥
-    public SavePoint[] savePoints;  // ½ºÆù Æ÷ÀÎÆ®µé
-    public Switch[] switches; // ½ºÀ§Ä¡µé
+    public Goal goal;  // ï¿½ï¿½ï¿½ï¿½
+    public Enemy[] enemies;  // ï¿½ï¿½ï¿½ï¿½
+    public Vector2Int spawnGridPos;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½Ç¥
+    public SavePoint[] savePoints;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½
+    public Switch[] switches; // ï¿½ï¿½ï¿½ï¿½Ä¡ï¿½ï¿½
 
-    void Start()  //½ÃÀÛ½Ã È£Ãâ
+    void Start()  //ï¿½ï¿½ï¿½Û½ï¿½ È£ï¿½ï¿½
     {
-        Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);  //ÇöÀç ¿ùµåÁÂÇ¥¸¦ ±×¸®µå ÁÂÇ¥·Î º¸Á¤
+        Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         gridPosition = new Vector2Int(cellPos.x, cellPos.y);
-        spawnGridPos = gridPosition;  //½ºÆù Æ÷ÀÎÆ®¸¦ ÇöÀç ±×¸®µåÁÂÇ¥·Î ¼³Á¤
-        enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);  // Àûµé °¨Áö
-        transform.position = GridToWorld(gridPosition);  //ÇöÀç ¿ùµåÁÂÇ¥¸¦ ±×¸®µåÁÂÇ¥·Î º¸Á¤
+        spawnGridPos = gridPosition;  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        transform.position = GridToWorld(gridPosition);  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     }
 
 
 
-    void Update()  //ÇÁ·¹ÀÓ¸¶´Ù È£Ãâ
+    void Update()  //ï¿½ï¿½ï¿½ï¿½ï¿½Ó¸ï¿½ï¿½ï¿½ È£ï¿½ï¿½
     {
-        if (isMoving) return;  // ÀÌµ¿ÁßÀÌ¸é ¸®ÅÏ
+        if (isMoving) return;  // ï¿½Ìµï¿½ï¿½ï¿½ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        Vector2Int inputDir = Vector2Int.zero;  //ÀÌµ¿ ¹æÇâ ÃÊ±âÈ­
-        // Á¶ÀÛÅ°¿¡ ¸Â´Â ÀÌµ¿¹æÇâ ¼³Á¤
+        Vector2Int inputDir = Vector2Int.zero;  //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+        // ï¿½ï¿½ï¿½ï¿½Å°ï¿½ï¿½ ï¿½Â´ï¿½ ï¿½Ìµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         if (Input.GetKey(KeyCode.W)) inputDir = Vector2Int.up;
         else if (Input.GetKey(KeyCode.S)) inputDir = Vector2Int.down;
         else if (Input.GetKey(KeyCode.A)) inputDir = Vector2Int.left;
         else if (Input.GetKey(KeyCode.D)) inputDir = Vector2Int.right;
 
-        if (inputDir != Vector2Int.zero)  //ÀÌµ¿¹æÇâÀÌ ¼³Á¤µÇ¾úÀ» °æ¿ì
+        if (inputDir != Vector2Int.zero)  //ï¿½Ìµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ç¾ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
         {
-            TryMove(inputDir);  //ÀÌµ¿ ½Ãµµ
+            TryMove(inputDir);  //ï¿½Ìµï¿½ ï¿½Ãµï¿½
         }
     }
 
-    bool IsWall(Vector2Int gridPos)  //º®ÀÌ ÀÖ´ÂÁö È®ÀÎ
+    bool IsWall(Vector2Int gridPos)  //ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´ï¿½ï¿½ï¿½ È®ï¿½ï¿½
     {
-        Vector3Int cellPos = new Vector3Int(gridPos.x, gridPos.y, 0);  // ÁÂÇ¥¸¦ 3Â÷¿ø ÁÂÇ¥·Î Çüº¯È¯
-        if (wallTilemap.HasTile(cellPos)) return true;  // º®ÀÌ ÀÖÀ» °æ¿ì Æ®·ç
+        Vector3Int cellPos = new Vector3Int(gridPos.x, gridPos.y, 0);  // ï¿½ï¿½Ç¥ï¿½ï¿½ 3ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½È¯
+        if (wallTilemap.HasTile(cellPos)) return true;  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Æ®ï¿½ï¿½
         foreach (var doorMap in doorTilemaps)
         {
             if (doorMap != null && doorMap.HasTile(cellPos))
                 return true;
-        }  // ¹®ÀÌ ÀÖÀ» °æ¿ì Æ®·ç
+        }  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ Æ®ï¿½ï¿½
 
         return false;
     }
     
-    Vector3 GridToWorld(Vector2Int gridPos)  //±×¸®µåÁÂÇ¥¸¦ ¿ùµåÁÂÇ¥·Î º¸Á¤
+    Vector3 GridToWorld(Vector2Int gridPos)  //ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
     {
         return new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0);
     }
     
-    void TryMove(Vector2Int dir)  //ÀÌµ¿ ½Ãµµ
+    void TryMove(Vector2Int dir)  //ï¿½Ìµï¿½ ï¿½Ãµï¿½
     {
-        Vector2Int targetGridPos = gridPosition + dir;  //ÇöÀç ÁÂÇ¥ + ÀÌµ¿ ¹æÇâ
+        Vector2Int targetGridPos = gridPosition + dir;  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ + ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½
 
-        if (IsWall(targetGridPos))  //¸¸¾à ÀÌµ¿ ÁÂÇ¥¿¡ º®ÀÌ ÀÖÀ»°æ¿ì ¸®ÅÏ
+        if (IsWall(targetGridPos))  //ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
             return;
 
-        StartCoroutine(MoveRoutine(targetGridPos));  //ÀÌµ¿ ·çÆ¾ ½ÃÀÛ
+        StartCoroutine(MoveRoutine(targetGridPos));  //ï¿½Ìµï¿½ ï¿½ï¿½Æ¾ ï¿½ï¿½ï¿½ï¿½
     }
-    IEnumerator MoveRoutine(Vector2Int targetGridPos)  //ÀÌµ¿ ·çÆ¾
+    IEnumerator MoveRoutine(Vector2Int targetGridPos)  //ï¿½Ìµï¿½ ï¿½ï¿½Æ¾
     {
-        isMoving = true;  //ÀÌµ¿ Á¶ÀÛÁß
+        isMoving = true;  //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 
-        Vector3 startPos = transform.position;  //½ÃÀÛÁÂÇ¥´Â ÇöÀçÁÂÇ¥
-        Vector3 targetPos = GridToWorld(targetGridPos);  //³¡ÁÂÇ¥´Â ¸ñÇ¥ÁÂÇ¥
+        Vector3 startPos = transform.position;  //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥
+        Vector3 targetPos = GridToWorld(targetGridPos);  //ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½Ç¥ï¿½ï¿½Ç¥
 
-        float elapsed = 0f;  //ÀÌµ¿ ÁøÇàµµ
+        float elapsed = 0f;  //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½àµµ
 
-        while (elapsed < moveDelay)  //ÀÌµ¿ ÁøÇàµµ°¡ ÀÌµ¿ µô·¹ÀÌ¿¡ µµ´ÞÇÒ¶§±îÁö
+        while (elapsed < moveDelay)  //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½àµµï¿½ï¿½ ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½Ì¿ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ò¶ï¿½ï¿½ï¿½ï¿½ï¿½
         {
-            elapsed += Time.deltaTime; //ÀÌµ¿ ÁøÇàµµ +1
-            float t = elapsed / moveDelay;  //ÁøÇàµµ ¼öÁØ
-            transform.position = Vector3.Lerp(startPos, targetPos, t);  // ÁøÇàµµ ¼öÁØ¿¡ µû¸¥ À§Ä¡¼³Á¤
-            yield return null;  //´ÙÀ½ ÇÁ·¹ÀÓÀ¸·Î ³Ñ¾î°¨
+            elapsed += Time.deltaTime; //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½àµµ +1
+            float t = elapsed / moveDelay;  //ï¿½ï¿½ï¿½àµµ ï¿½ï¿½ï¿½ï¿½
+            transform.position = Vector3.Lerp(startPos, targetPos, t);  // ï¿½ï¿½ï¿½àµµ ï¿½ï¿½ï¿½Ø¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½
+            yield return null;  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ñ¾î°¨
         }
 
-        transform.position = targetPos;  //ÇöÀç ¿ùµåÁÂÇ¥¸¦ ¸ñÇ¥ ÁÂÇ¥·Î º¯°æ
-        gridPosition = targetGridPos;  //ÇöÀç ±×¸®µåÁÂÇ¥¸¦ ¸ñÇ¥ ÁÂÇ¥·Î º¯°æ
-        isMoving = false;  //ÀÌµ¿ Á¶ÀÛ ³¡
+        transform.position = targetPos;  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        gridPosition = targetGridPos;  //ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        isMoving = false;  //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 
-        CheckEnemy();  //Àû È®ÀÎ
-        CheckGoal();  //°ñ È®ÀÎ
-        CheckSave();  //¼¼ÀÌºêÆ÷ÀÎÆ® È®ÀÎ
-        CheckSwitch();  //½ºÀ§Ä¡ È®ÀÎ
+        CheckEnemy();  //ï¿½ï¿½ È®ï¿½ï¿½
+        CheckGoal();  //ï¿½ï¿½ È®ï¿½ï¿½
+        CheckSave();  //ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½Æ® È®ï¿½ï¿½
+        CheckSwitch();  //ï¿½ï¿½ï¿½ï¿½Ä¡ È®ï¿½ï¿½
+        CheckColorZone();
+    }
+    void CheckColorZone()
+    {
+        ColorZone[] zones = FindObjectsOfType<ColorZone>();
+
+        foreach (var zone in zones)
+        {
+            if (gridPosition == zone.gridPos)
+            {
+                ColorChangeManager.Instance.ChangeColorSmooth();
+                return;
+            }
+        }
     }
     void CheckSwitch()
     {
@@ -109,12 +123,12 @@ public class PlayerGridMovement : MonoBehaviour
             sw.CheckSwitch(gridPosition);
         }
     }
-    void CheckGoal()  // °ñ À§Ä¡ È®ÀÎ
+    void CheckGoal()  // ï¿½ï¿½ ï¿½ï¿½Ä¡ È®ï¿½ï¿½
     {
-        if (gridPosition == goal.goalGridPos)  //°ñÀÌ ³ª¿Í °ãÄ¥°æ¿ì
+        if (gridPosition == goal.goalGridPos)  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¥ï¿½ï¿½ï¿½
         {
-            GoalUI.Instance.ShowGoal();  // °ñ ±ÛÀÚ¸¦ Ç¥½Ã
-            StartCoroutine(GoNextStage());  // ´ÙÀ½ ½ºÅ×ÀÌÁö·Î ÀÌµ¿
+            GoalUI.Instance.ShowGoal();  // ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¸ï¿½ Ç¥ï¿½ï¿½
+            StartCoroutine(GoNextStage());  // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
         }
     }
     IEnumerator GoNextStage()
@@ -129,31 +143,31 @@ public class PlayerGridMovement : MonoBehaviour
         }
         else
         {
-            Debug.Log("¸ðµç ½ºÅ×ÀÌÁö Å¬¸®¾î!");
+            Debug.Log("ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å¬ï¿½ï¿½ï¿½ï¿½!");
         }
     }
-    void CheckEnemy()  //Àû À§Ä¡ È®ÀÎ
+    void CheckEnemy()  //ï¿½ï¿½ ï¿½ï¿½Ä¡ È®ï¿½ï¿½
     {
         if (EnemyTilemapManager.Instance.IsEnemyAt(gridPosition))
         {
             Respawn();
         }
     }
-    public void Respawn()  // ¸®½ºÆù
+    public void Respawn()  // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     {
-        StopAllCoroutines(); //¸ðµç Coroutine Áß´Ü
-        isMoving = false;  //ÀÌµ¿ Á¶ÀÛ Ãë¼Ò
+        StopAllCoroutines(); //ï¿½ï¿½ï¿½ Coroutine ï¿½ß´ï¿½
+        isMoving = false;  //ï¿½Ìµï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
 
-        gridPosition = spawnGridPos;  //ÇöÀç ±×¸®µåÁÂÇ¥¸¦ ½ºÆùÁÂÇ¥·Î ÀÌµ¿
-        transform.position = GridToWorld(spawnGridPos);  //ÇöÀç ¿ùµåÁÂÇ¥¸¦ ½ºÆùÁÂÇ¥·Î ÀÌµ¿
+        gridPosition = spawnGridPos;  //ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Ìµï¿½
+        transform.position = GridToWorld(spawnGridPos);  //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç¥ï¿½ï¿½ ï¿½Ìµï¿½
     }
     void CheckSave()
     {
         foreach (SavePoint savePoint in savePoints)
         {
-            if (gridPosition == savePoint.saveGridPos)  //¼¼ÀÌºêÆ÷ÀÎµå°¡ ³ª¿Í °ãÄ¥°æ¿ì
+            if (gridPosition == savePoint.saveGridPos)  //ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½Îµå°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¥ï¿½ï¿½ï¿½
             {
-                spawnGridPos = gridPosition; //¼¼ÀÌºêÆ÷ÀÎÆ® ÀúÀå
+                spawnGridPos = gridPosition; //ï¿½ï¿½ï¿½Ìºï¿½ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½
                 return;
             }
         }

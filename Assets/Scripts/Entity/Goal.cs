@@ -3,12 +3,12 @@ using UnityEngine.Tilemaps;
 
 public class Goal : MonoBehaviour
 {
-    public Vector2Int goalGridPos;  // °ñÀÇ ±×¸®µåÁÂÇ¥
-    public Tilemap tilemap;   // ±âÁØ Å¸ÀÏ¸Ê
+    public Vector2Int goalGridPos;  // ê·¸ë¦¬ë“œ ì¢Œí‘œ
+    public Tilemap tilemap;   // ê¸°ì¤€ íƒ€ì¼ë§µ
 
     void Start()
     {
-        Vector3Int cellPos = tilemap.WorldToCell(transform.position);  //ÇöÀç ¿ùµåÁÂÇ¥¸¦ ±×¸®µåÁÂÇ¥·Î º¸Á¤
+        Vector3Int cellPos = tilemap.WorldToCell(transform.position);  //ì›”ë“œ ì¢Œí‘œë¥¼ ê·¸ë¦¬ë“œ ì¢Œí‘œë¡œ ë³€ê²½
         goalGridPos = new Vector2Int(cellPos.x, cellPos.y);
     }
 }
