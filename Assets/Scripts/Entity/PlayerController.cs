@@ -8,33 +8,35 @@ using UnityEngine.SceneManagement;
 public class PlayerGridMovement : MonoBehaviour
 {
     public float moveDuration = 0.15f;  //�̵� �ӵ�
-    public Tilemap wallTilemap;   // �� Ÿ�ϸ� ����
-    public Tilemap groundTilemap;  // �ٴ� Ÿ�ϸ� ����
-    public Tilemap[] doorTilemaps;  // �� Ÿ�ϸʵ� ����
-    public float moveDelay = 0.15f;  // �̵� �����
-    private bool isMoving = false;  // �̵� ���۰���
-    private Vector2Int gridPosition;  //Ÿ�ϸ�󿡼��� ��ǥ
+    public Tilemap wallTilemap;   // 벽 타일 맵
+    public Tilemap groundTilemap;  // 바닥 타일 맵
+    public Tilemap[] doorTilemaps;  // 문 타일 맵
+    public float moveDelay = 0.15f;  // 이동 딜레이
+    private bool isMoving = false;  // 이동중 확인
+    private Vector2Int gridPosition;  // 그리드 좌표
     public Vector2Int CurrentGridPosition => gridPosition;
-    public Goal goal;  // ����
-    public Enemy[] enemies;  // ����
-    public Vector2Int spawnGridPos;  // ���� ����Ʈ ��ǥ
-    public SavePoint[] savePoints;  // ���� ����Ʈ��
-    public Switch[] switches; // ����ġ��
+    public Goal goal;  // 골
+    public Enemy[] enemies;  // 적 들
+    public Vector2Int spawnGridPos;  // 스폰 포인트
+    public SavePoint[] savePoints;  // 세이브 포인트 객체
+    public Switch[] switches; // 스위치 객체
+    public ColorZone[] zones; // 색변경 객체
 
-    void Start()  //���۽� ȣ��
+    void Start()  //시작시 실행
     {
         Vector3Int cellPos = groundTilemap.WorldToCell(transform.position);  //���� ������ǥ�� �׸��� ��ǥ�� ����
         gridPosition = new Vector2Int(cellPos.x, cellPos.y);
         spawnGridPos = gridPosition;  //���� ����Ʈ�� ���� �׸�����ǥ�� ����
         enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);  // ���� ����
+        zones = Object.FindObjectsByType<ColorZone>(FindObjectsSortMode.None);
         transform.position = GridToWorld(gridPosition);  //���� ������ǥ�� �׸�����ǥ�� ����
     }
 
 
 
-    void Update()  //�����Ӹ��� ȣ��
+    void Update()  //스텝
     {
-        if (isMoving) return;  // �̵����̸� ����
+        if (isMoving) return;  // 이동중이라면 리턴
 
         Vector2Int inputDir = Vector2Int.zero;  //�̵� ���� �ʱ�ȭ
         // ����Ű�� �´� �̵����� ����
@@ -62,12 +64,12 @@ public class PlayerGridMovement : MonoBehaviour
         return false;
     }
     
-    Vector3 GridToWorld(Vector2Int gridPos)  //�׸�����ǥ�� ������ǥ�� ����
+    Vector3 GridToWorld(Vector2Int gridPos)  //그리드 좌표를 월드 좌표로 변환
     {
         return new Vector3(gridPos.x + 0.5f, gridPos.y + 0.5f, 0);
     }
     
-    void TryMove(Vector2Int dir)  //�̵� �õ�
+    void TryMove(Vector2Int dir)  //이동 시도
     {
         Vector2Int targetGridPos = gridPosition + dir;  //���� ��ǥ + �̵� ����
 
@@ -76,9 +78,9 @@ public class PlayerGridMovement : MonoBehaviour
 
         StartCoroutine(MoveRoutine(targetGridPos));  //�̵� ��ƾ ����
     }
-    IEnumerator MoveRoutine(Vector2Int targetGridPos)  //�̵� ��ƾ
+    IEnumerator MoveRoutine(Vector2Int targetGridPos)  //이동 루틴
     {
-        isMoving = true;  //�̵� ������
+        isMoving = true;  //이동중 표시
 
         Vector3 startPos = transform.position;  //������ǥ�� ������ǥ
         Vector3 targetPos = GridToWorld(targetGridPos);  //����ǥ�� ��ǥ��ǥ
@@ -97,77 +99,76 @@ public class PlayerGridMovement : MonoBehaviour
         gridPosition = targetGridPos;  //���� �׸�����ǥ�� ��ǥ ��ǥ�� ����
         isMoving = false;  //�̵� ���� ��
 
-        CheckEnemy();  //�� Ȯ��
-        CheckGoal();  //�� Ȯ��
-        CheckSave();  //���̺�����Ʈ Ȯ��
-        CheckSwitch();  //����ġ Ȯ��
-        CheckColorZone();
+        CheckEnemy();  //적 확인
+        CheckGoal();  //골 확인
+        CheckSave();  //세이브 포인트 확인
+        CheckSwitch();  //스위치 확인
+        CheckColorZone();  //색변경 확인
     }
     void CheckColorZone()
     {
-        ColorZone[] zones = FindObjectsOfType<ColorZone>();
-
         foreach (var zone in zones)
         {
             if (gridPosition == zone.gridPos)
             {
-                ColorChangeManager.Instance.ChangeColorSmooth();
+                zone.ccm.ChangeColorSmooth();
+                //ColorChangeManager.Instance.ChangeColorSmooth();
                 return;
             }
         }
     }
-    void CheckSwitch()
+    void CheckSwitch()  // 스위치 확인
     {
         foreach (var sw in switches)
         {
             sw.CheckSwitch(gridPosition);
         }
     }
-    void CheckGoal()  // �� ��ġ Ȯ��
+    void CheckGoal()  // 골 확인
     {
-        if (gridPosition == goal.goalGridPos)  //���� ���� ��ĥ���
+        if (gridPosition == goal.goalGridPos)  //골에 도달한 경우
         {
-            GoalUI.Instance.ShowGoal();  // �� ���ڸ� ǥ��
-            StartCoroutine(GoNextStage());  // ���� ���������� �̵�
+            GoalUI.Instance.ShowGoal();  // 골 UI 표시
+            StartCoroutine(GoNextStage());  // 다음 스테이지로
         }
     }
-    IEnumerator GoNextStage()
+    IEnumerator GoNextStage() // 다음 스테이지로 이동
     {
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(2f);  // 2초 기다림
 
-        int nextIndex = SceneManager.GetActiveScene().buildIndex + 1;
+        int nextIndex = SceneManager.GetActiveScene().buildIndex + 1; // 현재 스테이지 에서 1더함
 
-        if (nextIndex < SceneManager.sceneCountInBuildSettings)
+        if (nextIndex < SceneManager.sceneCountInBuildSettings)  //다음 스테이지가 있는 경우
         {
-            SceneManager.LoadScene(nextIndex);
+            SceneManager.LoadScene(nextIndex);  // 씬 불러오기
         }
-        else
+        else  // 없으면
         {
-            Debug.Log("��� �������� Ŭ����!");
+            Debug.Log("마지막 스테이지 입니다!");
         }
     }
-    void CheckEnemy()  //�� ��ġ Ȯ��
+    void CheckEnemy()  // 적 확인
     {
         if (EnemyTilemapManager.Instance.IsEnemyAt(gridPosition))
         {
             Respawn();
         }
     }
-    public void Respawn()  // ������
+    public void Respawn()  // 리스폰
     {
-        StopAllCoroutines(); //��� Coroutine �ߴ�
-        isMoving = false;  //�̵� ���� ���
+        StopAllCoroutines(); //모든 Coroutine 정지
+        isMoving = false;  //움직임 해제
 
-        gridPosition = spawnGridPos;  //���� �׸�����ǥ�� ������ǥ�� �̵�
-        transform.position = GridToWorld(spawnGridPos);  //���� ������ǥ�� ������ǥ�� �̵�
+        gridPosition = spawnGridPos;  //스폰 포인트로 이동
+        transform.position = GridToWorld(spawnGridPos);  //월드그리드좌표 실제로 이동
     }
     void CheckSave()
     {
         foreach (SavePoint savePoint in savePoints)
         {
-            if (gridPosition == savePoint.saveGridPos)  //���̺����ε尡 ���� ��ĥ���
+            if (gridPosition == savePoint.saveGridPos)  //세이브 포인트와 겹칠 경우
             {
-                spawnGridPos = gridPosition; //���̺�����Ʈ ����
+                spawnGridPos = gridPosition; //스폰 포인트 갱신
                 return;
             }
         }

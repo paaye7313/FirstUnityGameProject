@@ -5,6 +5,7 @@ public class ColorZone : MonoBehaviour
 {
     public Vector2Int gridPos;
     public Tilemap 기준Tilemap;
+    public ColorChangeManager ccm;
 
     void Start()
     {
